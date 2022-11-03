@@ -20,6 +20,16 @@
 #' mean.n(c(1,2,4,NA,5), 5) # returns NA
 
 mean.n <- function(x, n) {
+  if (!is.numeric(x)) {
+    stop("x must be a numeric vector (and not a data frame)")
+  }
+  if (!is.numeric(n) | length(n) == 1) {
+    stop("n must be a single numeric value (e.g., 4)")
+  }
+  legal.imputes <- c("mean","median","none")
+  if (!impute %in% legal.imputes) {
+    stop(paste("imputes must be one of:", paste0(legal.imputes,collapse = ', ')))
+  }
   n.miss <- sum(is.na(x))
   if ((length(x) - n.miss) < n) {
     return(NA_real_)
@@ -46,6 +56,12 @@ mean.n <- function(x, n) {
 #' d %>% summarise(across(everything(), sum.n, n=4))
 
 sum.n <- function(x, n, impute = "mean") {
+  if (!is.numeric(x)) {
+    stop("x must be a numeric vector (not a data frame)")
+  }
+  if (!is.numeric(n) | length(n) == 1) {
+    stop("n must be a single numeric value (e.g., 4)")
+  }
   n.miss <- sum(is.na(x))
   if ((length(x) - n.miss) < n) {
     return(NA_real_)
