@@ -21,7 +21,7 @@
 
 mean.n <- function(x, n) {
   n.miss <- sum(is.na(x))
-  if (length(x) - n.miss) < n) {
+  if ((length(x) - n.miss) < n) {
     return(NA_real_)
   } else {
     return(mean(x, na.rm =TRUE))
