@@ -81,3 +81,6 @@ sum.n <- function(x, n, impute = "mean") {
   return(sum(x))
 }
 
+score.cols <- function(x, cols, fn) {
+  
+}
