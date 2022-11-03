@@ -27,7 +27,7 @@ mean.n <- function(x, n) {
   if (!is.numeric(x)) {
     stop("x must be a numeric vector (and not a data frame)")
   }
-  if (!is.numeric(n) | length(n) == 1) {
+  if (!is.numeric(n) | !length(n) == 1) {
     stop("n must be a single numeric value (e.g., 4)")
   }
   n.miss <- sum(is.na(x))
@@ -59,7 +59,7 @@ sum.n <- function(x, n, impute = "mean") {
   if (!is.numeric(x)) {
     stop("x must be a numeric vector (not a data frame)")
   }
-  if (!is.numeric(n) | length(n) == 1) {
+  if (!is.numeric(n) | !length(n) == 1) {
     stop("n must be a single numeric value (e.g., 4)")
   }
   n.miss <- sum(is.na(x))
