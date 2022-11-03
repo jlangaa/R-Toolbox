@@ -1,0 +1,47 @@
+---
+title: "Example Code Chunks"
+author: "Joshua Langfus"
+date: "2022-11-03"
+output:
+  pdf_document: default
+  html_document:
+    df_print: kable
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+
+# import the .R file with functions to play with
+source("./prorated_scoring.R")
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Sample data
+
+```{r}
+x <- c(1:9, NA, 11:19, NA)
+y <- c(1:5, NA, 7:11, NA,13:20)
+z <- floor(sample(rnorm(1000,mean = 10, sd = 5),20))
+d <- data.frame(x,y, z)
+```
+
+# Prorated scoring
+
+Add a new column called `score_col` to the dataframe `d` using the `score.cols.sum` function. In this case `n=2` and we're using mean imputatino for missing values.
+
+Use the familiar `mutate()` syntax. The trick is to use `cur_data()` as the x argument -- this passes each row of the data frame to the function.
+
+```{r}
+d %>%
+  mutate(score_col = score.cols.sum(x=cur_data(),cols = c("x","y","z"), impute = "mean",n = 2))
+```
+
+Also works for the the mean with `score.cols.mean`.
+
+```{r}
+d %>%
+  mutate(score_col = score.cols.mean(x=cur_data(),cols = c("x","y","z"),n = 2))
+```
+
+Each of these implements the `sum.n()` and `mean.n()` functions, respectively.

@@ -23,7 +23,7 @@
 #' mean.n(c(1,2,4,NA,5), 4) # returns 5
 #' mean.n(c(1,2,4,NA,5), 5) # returns NA
 
-mean.n <- function(x, n) {
+mean.n <- function(x, n, ...) {
   if (!is.numeric(x)) {
     stop("x must be a numeric vector (and not a data frame)")
   }
@@ -55,7 +55,7 @@ mean.n <- function(x, n) {
 #' d <- data.frame(x = c(1,2,3,NA,5), y = c(1, 3, NA, NA, 5))
 #' d %>% summarise(across(everything(), sum.n, n=4))
 
-sum.n <- function(x, n, impute = "mean") {
+sum.n <- function(x, n, impute = "mean", ...) {
   if (!is.numeric(x)) {
     stop("x must be a numeric vector (not a data frame)")
   }
@@ -81,6 +81,20 @@ sum.n <- function(x, n, impute = "mean") {
   return(sum(x))
 }
 
-score.cols <- function(x, cols, fn) {
-  
+score.cols.mean <- function(x, cols, n, ...) {
+  extras = list(...)
+
+  ret <- x %>%
+    rowwise() %>%
+    transmute(Pro_score = mean.n(c_across(all_of(cols)), n))
+  return(ret$Pro_score)
+}
+
+score.cols.sum <- function(x, cols, n, impute = "mean", ...) {
+  extras = list(...)
+
+  ret <- x %>%
+    rowwise() %>%
+    transmute(Pro_score = sum.n(c_across(all_of(cols)), n, impute))
+  return(ret$Pro_score)
 }
