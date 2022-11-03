@@ -2,7 +2,11 @@
 # author: "Joshua Langfus"
 # date: "2022-11-03"
 
-# This file contains function useful for doing prorated scoring of item-level data in R. This is meant to roughly replicate SPSS syntax such as, e.g.,  MEAN.5 (which computes a mean as long as there are 5 valid observations). Functions are written in base R whenever possible, with additional package requirements noted when possible. Functions are documented in Roxygen syntax for consistency.
+# This file contains function useful for doing prorated scoring of item-level data in R. 
+# This is meant to roughly replicate SPSS syntax such as, e.g.,  MEAN.5 (which computes 
+# a mean as long as there are 5 valid observations). Functions are written in base R whenever
+# possible, with additional package requirements noted when possible. Functions are documented
+# in Roxygen syntax for consistency.
 
 #' Compute a prorated mean for a give number of valid observations
 #'
