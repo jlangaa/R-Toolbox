@@ -26,10 +26,6 @@ mean.n <- function(x, n) {
   if (!is.numeric(n) | length(n) == 1) {
     stop("n must be a single numeric value (e.g., 4)")
   }
-  legal.imputes <- c("mean","median","none")
-  if (!impute %in% legal.imputes) {
-    stop(paste("imputes must be one of:", paste0(legal.imputes,collapse = ', ')))
-  }
   n.miss <- sum(is.na(x))
   if ((length(x) - n.miss) < n) {
     return(NA_real_)
@@ -63,13 +59,17 @@ sum.n <- function(x, n, impute = "mean") {
     stop("n must be a single numeric value (e.g., 4)")
   }
   n.miss <- sum(is.na(x))
+  legal.imputes <- c("mean","median","none")
+  if (!impute %in% legal.imputes) {
+    stop(paste("imputes must be one of:", paste0(legal.imputes,collapse = ', ')))
+  }
   if ((length(x) - n.miss) < n) {
     return(NA_real_)
     
   } else if (impute == "mean") {
-      m <- mean(x, na.rm = TRUE)
+    m <- mean(x, na.rm = TRUE)
   } else if (impute == "median") {
-      m <- median(x, na.rm = TRUE)
+    m <- median(x, na.rm = TRUE)
   } else if (impute == "none") {
     x <- na.omit(x)
   }
