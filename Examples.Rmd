@@ -28,7 +28,7 @@ d <- data.frame(x,y, z)
 
 # Prorated scoring
 
-Add a new column called `score_col` to the dataframe `d` using the `score.cols.sum` function. In this case `n=2` and we're using mean imputatino for missing values.
+Add a new column called `score_col` to the dataframe `d` using the `score.cols.sum` function. Specify the columns across which to score with the `cols` argument -- make sure to pass a character vector of the column names as they appear in the input dataframe. Finally, in this case `n=2` and we're using mean imputation for missing values.
 
 Use the familiar `mutate()` syntax. The trick is to use `cur_data()` as the x argument -- this passes each row of the data frame to the function.
 
