@@ -36,7 +36,7 @@ mean.n <- function(x, n) {
 #'
 #' @param x A numeric vector for which to take the sum
 #' @param n, A scalar indicating the minimum number of valid observations
-#' @param impute A character vector indicating either "mean" (default) or "median" imputation of missing values.
+#' @param impute A character vector indicating either "mean" (default) or "median" imputation of missing values. If "none" is given, no prorating is performed and the simple sum is returned (same as sum(x, na.rm = TRUE))
 #' @param ... Additional arguments (not yet implemented)
 #'
 #' @return A numeric, the prorated sum of x
@@ -54,8 +54,10 @@ sum.n <- function(x, n, impute = "mean") {
       m <- mean(x, na.rm = TRUE)
   } else if (impute == "median") {
       m <- median(x, na.rm = TRUE)
+  } else if (impute == "none") {
+    x <- na.omit(x)
   }
   x[is.na(x)] <- m
-  return(mean(x))
+  return(sum(x))
 }
 
