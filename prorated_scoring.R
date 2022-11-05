@@ -76,6 +76,8 @@ sum.n <- function(x, n, impute = "mean", ...) {
     m <- median(x, na.rm = TRUE)
   } else if (impute == "none") {
     x <- na.omit(x)
+  } else {
+    stop("something went wrong :(")
   }
   x[is.na(x)] <- m
   return(sum(x))
