@@ -1,0 +1,10 @@
+# IRT reliability from MIRT
+
+# Plot with a line at reliability = .8
+plot(model,theta_lim=c(-2,4), type = 'rxx', lwd=2, par.settings = simpleTheme(col='magenta'))+ layer(panel.abline(h = .8))
+
+get_rxx <- function(mod, theta) {
+ti <- testinfo(mod,matrix(theta)) # computes the test information
+rxx <- ti / (1 + ti) # convert test information to reliability following formula from here: https://stats.stackexchange.com/questions/132738/reliability-in-irt-style
+return(data.frame(theta,ti))
+}
