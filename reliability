@@ -23,3 +23,8 @@ plot_rxx <- function(mod,theta,thresh,title="Marginal Reliability") {
     theme_classic(base_size = 12) + theme(plot.title = element_text(face="bold",hjust=.5))
   return(p)
 }
+
+## Usage:
+# th <- seq(-5,5,.1)
+# p <- rxx.plot(mod = my_mirt_model, theta = th, thresh = .8)
+# p
