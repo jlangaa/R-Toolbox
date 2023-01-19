@@ -1,10 +1,25 @@
-# IRT reliability from MIRT
-
-# Plot with a line at reliability = .8
-plot(model,theta_lim=c(-2,4), type = 'rxx', lwd=2, par.settings = simpleTheme(col='magenta'))+ layer(panel.abline(h = .8))
-
 get_rxx <- function(mod, theta) {
-ti <- testinfo(mod,matrix(theta)) # computes the test information
-rxx <- ti / (1 + ti) # convert test information to reliability following formula from here: https://stats.stackexchange.com/questions/132738/reliability-in-irt-style
-return(data.frame(theta,ti))
+  ti<-testinfo(mod, matrix(theta))
+  rxx<- ti/(1+ti)
+  return(data.frame(theta=theta,rxx=rxx))
+}
+
+rxx.plot <- function(mod,theta,thresh,title="Marginal Reliability") {
+  # get reliabilities
+  d <- get_rxx(mod,theta)
+  
+  # find the points where rxx is above threshold
+  xx <- filter(d, rxx >= thresh)
+  # grab the first and last rows as first and last points where rxx > threshold
+  xx <- xx[c(1,nrow(xx)),]
+  
+  p <- ggplot(d, aes(x = theta, y = rxx)) +
+    geom_line(linewidth = 1, alpha = .8) +
+    geom_vline(xintercept = xx[1,'theta'], linetype = 5) +
+    geom_vline(xintercept = xx[2,'theta'], linetype = 5) +
+    geom_hline(yintercept = thresh, linetype = 2)+
+    geom_label(data=xx, aes(x = theta, y = 0, label = round(theta,2)),label.size = NA, nudge_x = 0, nudge_y = .1) +
+    labs(title = title,x = expression(theta), y = expression("r"[xx]) )+
+    theme_classic(base_size = 12) + theme(plot.title = element_text(face="bold",hjust=.5))
+  return(p)
 }
