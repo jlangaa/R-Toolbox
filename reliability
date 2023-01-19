@@ -4,7 +4,7 @@ get_rxx <- function(mod, theta) {
   return(data.frame(theta=theta,rxx=rxx))
 }
 
-rxx.plot <- function(mod,theta,thresh,title="Marginal Reliability") {
+plot_rxx <- function(mod,theta,thresh,title="Marginal Reliability") {
   # get reliabilities
   d <- get_rxx(mod,theta)
   
