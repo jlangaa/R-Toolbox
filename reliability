@@ -9,7 +9,7 @@ plot_rxx <- function(mod,theta,thresh,title="Marginal Reliability") {
   d <- get_rxx(mod,theta)
   
   # find the points where rxx is above threshold
-  xx <- filter(d, rxx >= thresh)
+  xx <- d[d$rxx >= thresh,]
   # grab the first and last rows as first and last points where rxx > threshold
   xx <- xx[c(1,nrow(xx)),]
   
