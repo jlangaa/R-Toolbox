@@ -45,3 +45,89 @@ d %>%
 ```
 
 Each of these implements the `sum.n()` and `mean.n()` functions, respectively.
+
+
+# Automatic figure making from MIRT plots
+
+Code from the PANSS short form building project (TEOSS data)
+
+```{r}
+library(mirt)
+library(ggpubr)
+get_rxx <- function(mod, theta) {
+  ti<-testinfo(mod, matrix(theta))
+  rxx<- ti/(1+ti)
+  return(data.frame(theta=theta,rxx=rxx))
+}
+
+rxx.plot <- function(mod,theta,thresh,title="Marginal Reliability") {
+  # get reliabilities
+  d <- get_rxx(mod,theta)
+  
+  # find the points where rxx is above threshold
+  xx <- filter(d, rxx >= thresh)
+  # grab the first and last rows as first and last points where rxx > threshold
+  xx <- xx[c(1,nrow(xx)),]
+  
+  p <- ggplot(d, aes(x = theta, y = rxx)) +
+    geom_line(linewidth = 1, alpha = .8) +
+    geom_vline(xintercept = xx[1,'theta'], linetype = 5) +
+    geom_vline(xintercept = xx[2,'theta'], linetype = 5) +
+    geom_hline(yintercept = thresh, linetype = 2)+
+    geom_text(data=xx, aes(x = theta, y = 0, label = round(theta,2)),nudge_x = .7, nudge_y = .1) +
+    labs(title = title, x = expression(theta), y = expression("r"[xx]))+
+    theme_classic(base_size = 12) + theme(plot.title = element_text(face = "bold",hjust = .5))
+  return(p)
+}
+
+
+dat <- basepan30
+scale.list <- list(
+	"Aggression" = c("pos_p7","gps_g14"),
+	"Withdrawal / Apathy" = c("neg_n2","neg_n4"),
+	"Thought Disturbance" = c("pos_p2","gps_g11"),
+	"Delusions & Odd Content" = c("pos_p1","gps_g9"),
+	"Internalizing" = c("gps_g2","gps_g3")
+)
+
+th.lims <- c(-4, 4)
+th <- seq(th.lims[1], th.lims[2], .01)
+
+d <- scale.list %>%
+	bind_rows() %>%
+	pivot_longer(everything(), names_to = "Scale",values_to = "Items") %>%
+	nest_by(Scale, .key = "Items") %>%
+	# mutate(Items = list(Items[[,1]]))
+	mutate(items = c(Items[,1])) %>%
+	mutate(data  = list(basepan30[items])) %>%
+	mutate(model = list(paste0(Scale,"=",paste0(items, collapse = ",")))) %>%
+	mutate(grm   = list(mirt(data = data, model = model, timetype = "graded", SE = TRUE, verbose = FALSE))) %>%
+	mutate(coefs = list(coef(grm, IRTpars = TRUE, simplify = TRUE, na.rm = TRUE))) %>%
+	mutate(plots = list(list(
+		"OCC" = plot(grm, type = "trace", main = paste0("OCC\n", Scale),
+								 par.settings=simpleTheme(lty=1:4,lwd = 1),auto.key=FALSE,par.strip.text = NULL, theta_lim=th.lims),
+		"rxx" = rxx.plot(grm, th, .8, paste0("Reliability\n",Scale))
+			))
+		)
+
+p <- d$plots
+names(p) <- d$Scale	
+
+pl <- unlist(p, recursive = F)
+```
+```{r,  fig.width = 8, fig.asp = 2,warning=FALSE}
+fig2 <- ggarrange(plotlist = pl,
+	# p$k2agg$OCC,p$k2agg$rxx,
+	# p$k2cog$OCC,p$k2cog$rxx,
+	# p$k2del$OCC,p$k2del$rxx,
+	# p$k2int$OCC,p$k2int$rxx,
+	# p$k2wda$OCC,p$k2wda$rxx,
+	widths = c(1.5,1),
+	ncol = 2,
+	nrow = 5)
+tiff("Figure 2 GRM Upscale.tiff", width = 190, height = 450, units = 'mm', res=1000)
+fig2
+dev.off()
+# ggexport(fig2, filename = "Figure 2 GRM Upscale.tiff", width = 5512, height = 8803)
+# getwd()
+```
