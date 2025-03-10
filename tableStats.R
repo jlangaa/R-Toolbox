@@ -25,7 +25,7 @@ rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
     varname <- "var"
   }
   
-  if (!is.null(case)) {
+  if (length(unique.x) == 2 & !is.null(case)) {
     type <- "binary"
     if (!case %in% unique(x)) {
       stop("Case not represented in data; check Case?")
