@@ -64,7 +64,7 @@ rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
     )
   }
   
-  if(!exists("d")) {
+  if(d=="") {
     stop(sprintf("input type (%s) with %d levels not supported",class(x),unique(x)))
   }
   
