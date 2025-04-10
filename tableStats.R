@@ -1,7 +1,7 @@
 ## Function for computing useful descriptive statistics from a vector
 ## Handles count / continuous data, including factors with multiple levels
 
-rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
+rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE) {
   dd <- tibble(
     varname = character(),
     n       = integer(),
@@ -29,7 +29,7 @@ rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
     type <- "binary"
     if (is.null(case)) {
       case <- unique(x)[1]
-      warning(sprintf("data has two levels but case is not defined; setting case to %s", case))
+      warning(sprintf("data has two levels but case is not defined; setting case to %s\n", case))
     }
     if (!case %in% unique(x)) {
       stop("Case not represented in data; check case argument?")
@@ -76,5 +76,38 @@ rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
     return(ret)
   } else {
     return(list("N" = N, "Type" = type, "Stats" = ret))
+  }
+}
+
+tabStat <- function(x, .by = NULL, ...) {
+  c <- quos(...)
+  grp <- enquo(.by)
+  
+  if (missing(.by)) {
+    if (length(c) == 0) {
+      x %>%
+        imap( ~ rowStat(.x, varname = .y, as.df = TRUE)) %>%
+        bind_rows()
+    } else {
+      x %>%
+        select(!!!c) %>%
+        imap( ~ rowStat(.x, varname = .y, as.df = TRUE)) %>%
+        bind_rows()
+    }
+  } else {
+    if (length(c) == 0) {
+      x %>%
+        nest_by(!!grp) %>%
+        mutate(stats = list(imap(data, ~ rowStat(.x, varname = .y, as.df = TRUE)) %>% bind_rows())) %>%
+        unnest(stats) %>%
+        select(-data)
+    } else {
+      x %>%
+        select(!!!c, !!grp) %>%
+        nest_by(!!grp) %>%
+        mutate(stats = list(imap(data, ~ rowStat(.x, varname = .y, as.df = TRUE)) %>% bind_rows())) %>%
+        unnest(stats) %>%
+        select(-data)
+    }
   }
 }
