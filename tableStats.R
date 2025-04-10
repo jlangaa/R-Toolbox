@@ -13,9 +13,9 @@ rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
     max     = numeric()
   )
   N <- length(x)
-  unique.x <- length(unique(x))
+  unique.x <- unique(x)
   type <- ""
-  d <- ""
+  d <- NULL
   
   if (is.null(varname) & !is.null(case)){
     varname <- as.character(case)
@@ -25,19 +25,21 @@ rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
     varname <- "var"
   }
   
-  if (length(unique.x) == 2 & !is.null(case)) {
+  if (length(unique.x) == 2) {
     type <- "binary"
+    if (is.null(case)) {
+      case <- unique(x)[1]
+      warning(sprintf("data has two levels but case is not defined; setting case to %s", case))
+    }
     if (!case %in% unique(x)) {
-      stop("Case not represented in data; check Case?")
+      stop("Case not represented in data; check case argument?")
     }
     d <- tibble(
       varname= varname,
       n    = sum(x == case),
       perc = n/N * 100
     )
-  }
-  
-  if (is.character(x) | is.factor(x)) {
+  } else if (is.character(x) | is.factor(x)) {
     type <- "factor"
     levs <- unique(x) |> as.character() |> na.omit()
     d <- map(levs, \(u) {
@@ -47,9 +49,7 @@ rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
         perc = n / N * 100
       ) 
     }) %>% bind_rows()
-  }
-  
-  if (is.numeric(x)){
+  } else if (is.numeric(x)){
     type <- "numeric"
     ## Treat as continuous --> stat 'em
     d <- tibble(
@@ -62,9 +62,11 @@ rowStat <- function(x, case = NULL, varname = NULL,as.df = FALSE, ...) {
       min = min(x, na.rm=TRUE),
       max = max(x,na.rm=TRUE)
     )
+  } else {
+    stop('data type not supported')
   }
   
-  if(d=="") {
+  if(is.null(d)) {
     stop(sprintf("input type (%s) with %d levels not supported",class(x),unique(x)))
   }
   
